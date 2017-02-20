@@ -1,0 +1,42 @@
+'''
+Script to test automation of render layers setup
+@author: sharmah
+'''
+
+##import render setup and maya commands modules
+import maya.app.renderSetup.model.override as override
+import maya.app.renderSetup.model.selector as selector
+import maya.app.renderSetup.model.collection as collection
+import maya.app.renderSetup.model.renderLayer as renderLayer
+import maya.app.renderSetup.model.renderSetup as renderSetup
+import maya.app.renderSetup.model.override as override
+import maya.cmds as cmds
+
+#help(collection)
+
+#envirSet = cmds.sets(n="ENVIR")
+
+#create render setup instance
+rs = renderSetup.instance()
+
+#create and append the render layer
+envirLayer = rs.createRenderLayer("ENVIR")
+
+#create envir collection
+c_allEnvir = envirLayer.createCollection("c_allEnvir")
+c_allEnvir.getSelector().setFilterType(0)
+c_allEnvir.getSelector().setPattern("ENVIR*")
+
+#create char collection
+c_allChar = envirLayer.createCollection("c_allChar")
+c_allChar.getSelector().setFilterType(0)
+c_allChar.getSelector().setPattern("CHAR*")
+
+#create collection to turn off all chars from envir layer
+c_allCharShapes = c_allChar.createCollection("c_allCharShapes")
+c_allCharShapes.getSelector().setFilterType(2)
+c_allCharShapes.getSelector().setPattern("*")
+c_allCharShapes.createAbsoluteOverride("Primary Visibility", "Primary Visibility")
+
+#set render layer visible
+rs.switchToLayer(envirLayer)

@@ -1,0 +1,34 @@
+import maya.cmds as cmds
+import sys
+
+path = "/homes/sharmah/maya/projects/Scripting/scripts/"
+if path not in sys.path:
+    sys.path.append(path)
+
+import envirTemplate
+reload(envirTemplate)
+
+winID = "kevsUI"
+
+def main():
+    
+    if cmds.window(winID, exists=True):
+        cmds.deleteUI(winID)
+    else:
+        cmds.window(title = "Template Setup")
+    
+    cmds.columnLayout(columnAttach=('both', 10), columnWidth=180)
+    cmds.rowLayout(nc=2, columnWidth2=(90,80))
+    cmds.button(label="ENVIR", width=75, c=foo)
+    cmds.button(label="CHAR", width=75)
+    
+    cmds.setParent("..")
+    cmds.rowLayout(nc=2, columnWidth2=(90,80))
+    cmds.button(label="Test3", width=75)
+    cmds.button(label="Test4", width=75)
+    cmds.showWindow()
+    
+def foo(*args):
+    envirTemplate.createEnvirLayer()
+    
+main()

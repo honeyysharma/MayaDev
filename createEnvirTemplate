@@ -10,7 +10,6 @@ import maya.app.renderSetup.model.collection as collection
 import maya.app.renderSetup.model.renderLayer as renderLayer
 import maya.app.renderSetup.model.renderSetup as renderSetup
 import maya.app.renderSetup.model.override as override
-import maya.cmds as cmds
 
 def createEnvirLayer():
     """create render setup instance"""
@@ -20,20 +19,20 @@ def createEnvirLayer():
     envirLayer = rs.createRenderLayer("ENVIR")
     
     """create envir collection"""
-    c_allEnvir = envirLayer.createCollection("c_allEnvir")
+    c_allEnvir = envirLayer.createCollection("c_envirAllEnvir")
     c_allEnvir.getSelector().setFilterType(0)
     c_allEnvir.getSelector().setPattern("ENVIR*")
     
     """create collection to turn off all chars from envir layer"""
-    c_allChar = envirLayer.createCollection("c_allChar")
+    c_allChar = envirLayer.createCollection("c_envirAllChar")
     c_allChar.getSelector().setFilterType(0)
     c_allChar.getSelector().setPattern("CHAR*")
     
     #create sub collection
-    c_allCharShapes = c_allChar.createCollection("c_allCharShapes")
+    c_allCharShapes = c_allChar.createCollection("c_envirAllCharShapes")
     c_allCharShapes.getSelector().setFilterType(2)
     c_allCharShapes.getSelector().setPattern("*")
-    o_charVisibility = c_allCharShapes.createOverride("charVisibility", override.AbsOverride.kTypeId)
+    o_charVisibility = c_allCharShapes.createOverride("envirCharVisibility", override.AbsOverride.kTypeId)
     o_charVisibility.finalize("CHAR.visibility")
     o_charVisibility.setAttrValue(0)
     
@@ -52,4 +51,30 @@ def createEnvirLayer():
     """set render layer visible"""
     rs.switchToLayer(envirLayer)
     
+def createCharLayer():
+    """create render setup instance"""
+    rs = renderSetup.instance()
+    
+    """create and append the render layer"""
+    charLayer = rs.createRenderLayer("CHAR")
+    
+    """create char collection"""
+    c_allEnvir = charLayer.createCollection("c_charAllEnvir")
+    c_allEnvir.getSelector().setFilterType(0)
+    c_allEnvir.getSelector().setPattern("ENVIR*")
+    
+    #create sub collection
+    c_allEnvirShapes = c_allEnvir.createCollection("c_charAllEnvirShapes")
+    c_allEnvirShapes.getSelector().setFilterType(2)
+    c_allEnvirShapes.getSelector().setPattern("*")
+    o_envirVisibility = c_allEnvirShapes.createOverride("charEnvirVisibility", override.AbsOverride.kTypeId)
+    o_envirVisibility.finalize("ENVIR.visibility")
+    o_envirVisibility.setAttrValue(0)
+    
+    """create collection to turn off all chars from envir layer"""
+    c_allChar = charLayer.createCollection("c_charAllChar")
+    c_allChar.getSelector().setFilterType(0)
+    c_allChar.getSelector().setPattern("CHAR*")
+    
 createEnvirLayer()
+createCharLayer()

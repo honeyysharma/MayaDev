@@ -1,0 +1,101 @@
+'''
+Script to test automation of render layers setup
+@author: sharmah
+'''
+
+##import render setup and maya commands modules
+import maya.app.renderSetup.model.renderSetup as renderSetup
+import maya.app.renderSetup.model.override as override
+import maya.app.renderSetup.model.selector as selector
+import maya.app.renderSetup.model.collection as collection
+import maya.app.renderSetup.model.renderLayer as renderLayer
+import maya.app.renderSetup.model.override as override
+import maya.app.renderSetup.model.renderLayer as layer
+
+def getListUptoFirstMeshNode(groupName):
+    newList = []
+    groupNodes = cmds.ls(groupName, dag=1)
+    for node in groupNodes:
+        newList.append(node)
+        if cmds.nodeType(node) == 'mesh':
+            break
+            
+    return ("".join(map((lambda node: '|'+ node), newList))) 
+
+def createEnvirLayer():
+    """create render setup instance"""
+    rs = renderSetup.instance()
+    
+    """create and append the render layer"""
+    envirLayer = rs.createRenderLayer("ENVIR")
+    
+    """create envir collection"""
+    c_allLights = envirLayer.createCollection("c_envirAllLights")
+    c_allLights.getSelector().setFilterType(0)
+    c_allLights.getSelector().setPattern("LIGHTS*")
+    
+    """
+    c_customLight = envirLayer.createCollection("c_envirCustomLight")
+    c_customLight.getSelector().setFilterType(0)
+    c_customLight.getSelector().setPattern("|LIGHTS|bulb_lgt")
+    o_lightsVisibility = c_customLight.createOverride("envirLightsVisibility", override.AbsOverride.kTypeId)
+    o_lightsVisibility.finalize("|LIGHTS|bulb_lgt"+".visibility")
+    o_lightsVisibility.setAttrValue(0)
+    """
+    
+    
+    """create envir collection"""
+    c_allEnvir = envirLayer.createCollection("c_envirAllEnvir")
+    c_allEnvir.getSelector().setFilterType(0)
+    c_allEnvir.getSelector().setPattern("ENVIR*")
+    
+    """create collection to turn off all chars from envir layer"""
+    c_allChar = envirLayer.createCollection("c_envirAllChar")
+    c_allChar.getSelector().setFilterType(0)
+    c_allChar.getSelector().setPattern("CHAR*")
+    o_charVisibility = c_allChar.createOverride("envirCharVisibility", override.AbsOverride.kTypeId)
+    o_charVisibility.finalize(getListUptoFirstMeshNode("CHAR")+".primaryVisibility")
+    o_charVisibility.setAttrValue(0)
+    
+    """create collection to turn off all unwanted envir assets from main envir layer"""
+    c_envirProps = envirLayer.createCollection("c_envirProps")
+    c_envirProps.getSelector().setPattern("Props*")
+    o_envirPropsVisibility = c_envirProps.createOverride("envirPropsVisibility", override.AbsOverride.kTypeId)
+    o_envirPropsVisibility.finalize("ENVIR"+getListUptoFirstMeshNode("Props")+".primaryVisibility")
+    o_envirPropsVisibility.setAttrValue(0)
+    
+    
+    """set render layer visible"""
+    rs.switchToLayer(envirLayer)
+   
+   
+createEnvirLayer() 
+    
+def createCharLayer():
+    """create render setup instance"""
+    rs = renderSetup.instance()
+    
+    """create and append the render layer"""
+    charLayer = rs.createRenderLayer("CHAR")
+    
+    """create char collection"""
+    c_allEnvir = charLayer.createCollection("c_charAllEnvir")
+    c_allEnvir.getSelector().setFilterType(0)
+    c_allEnvir.getSelector().setPattern("ENVIR*")
+    
+    #create sub collection
+    c_allEnvirShapes = c_allEnvir.createCollection("c_charAllEnvirShapes")
+    c_allEnvirShapes.getSelector().setFilterType(2)
+    c_allEnvirShapes.getSelector().setPattern("*")
+    o_envirVisibility = c_allEnvirShapes.createOverride("charEnvirVisibility", override.AbsOverride.kTypeId)
+    o_envirVisibility.finalize("ENVIR.visibility")
+    o_envirVisibility.setAttrValue(0)
+    
+    """create collection to turn off all chars from envir layer"""
+    c_allChar = charLayer.createCollection("c_charAllChar")
+    c_allChar.getSelector().setFilterType(0)
+    c_allChar.getSelector().setPattern("CHAR*")
+    
+
+#createCharLayer()
+    

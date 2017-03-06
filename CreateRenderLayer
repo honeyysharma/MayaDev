@@ -12,6 +12,11 @@ import maya.app.renderSetup.model.renderLayer as renderLayer
 import maya.app.renderSetup.model.override as override
 import maya.app.renderSetup.model.renderLayer as layer
 
+"""
+node = cmds.selectedNodes()[0]
+print cmds.listRelatives(node, allParents=True)
+"""
+
 def getListUptoFirstMeshNode(groupName):
     newList = []
     groupNodes = cmds.ls(groupName, dag=1)
@@ -31,8 +36,8 @@ def createEnvirLayer():
     
     """create envir collection"""
     c_allLights = envirLayer.createCollection("c_envirAllLights")
-    c_allLights.getSelector().setFilterType(0)
-    c_allLights.getSelector().setPattern("LIGHTS*")
+    c_allLights.getSelector().setFilterType(4)
+    c_allLights.getSelector().setPattern("*")
     
     """
     c_customLight = envirLayer.createCollection("c_envirCustomLight")

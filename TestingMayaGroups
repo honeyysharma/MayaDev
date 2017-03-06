@@ -12,6 +12,22 @@ import maya.app.renderSetup.model.renderSetup as renderSetup
 import maya.app.renderSetup.model.override as override
 import maya.app.renderSetup.views.overrideUtils as utils
 
+import maya.cmds as cmds
+
+def getListUptoFirstMeshNode(groupName):
+    newList = []
+    groupNodes = cmds.ls(groupName, dag=1)
+    for node in groupNodes:
+        newList.append(node)
+        if cmds.nodeType(node) == 'mesh':
+            break
+            
+    return ("".join(map((lambda node: '|'+ node), newList)))      
+    
+            
+attribute = getListUptoFirstMeshNode("ENVIR")
+print attribute
+
 groupList = cmds.ls('CHAR', dag=1)
 groupList = groupList[0:3]
 groupList = "".join(map((lambda x: '|'+ x), groupList))

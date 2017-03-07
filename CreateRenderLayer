@@ -13,8 +13,11 @@ import maya.app.renderSetup.model.override as override
 import maya.app.renderSetup.model.renderLayer as layer
 
 
-nodes = cmds.selectedNodes()
-print ("").join(cmds.selectedNodes())
+print cmds.selectedNodes()
+nodes = map(lambda x: str(x), cmds.selectedNodes())
+print nodes
+pattern = (",").join(map(lambda x: x+"*", cmds.selectedNodes()))
+print pattern
 
 """
 nodeName = str(node)
@@ -36,7 +39,8 @@ def getListUptoFirstMeshNode(groupName):
         if cmds.nodeType(node) == 'mesh':
             break
             
-    return ("".join(map((lambda node: '|'+ node), newList))) 
+    return ("".join(map((lambda node: '|'+ node), newList)))
+
 
 def createEnvirLayer(layerName):
     """create render setup instance"""
@@ -96,10 +100,10 @@ def createCustomEnvirLayer(layerName):
     o_envirVisibility.setAttrValue(0)
     
     
-    """create envir collection"""
+    """create custom envir collection"""
     c_customEnvir = envirLayer.createCollection("c_envirCustomEnvir")
     c_customEnvir.getSelector().setFilterType(0)
-    c_customEnvir.getSelector().setPattern(("").join(cmds.selectedNodes()))
+    c_customEnvir.getSelector().setPattern((",").join(map(lambda x: x+"*", cmds.selectedNodes())))
     o_customEnvirVisibility = c_customEnvir.createOverride("customEnvirVisibility", override.AbsOverride.kTypeId)
     o_customEnvirVisibility.finalize("ENVIR"+getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".primaryVisibility")
     o_customEnvirVisibility.setAttrValue(1)
@@ -114,6 +118,8 @@ def createCustomEnvirLayer(layerName):
     
     """set render layer visible"""
     rs.switchToLayer(envirLayer)
+    
+createCustomEnvirLayer("CUSTOM")
    
     
 def createCharLayer(layerName):
@@ -212,6 +218,6 @@ def createPropsLayer(layerName):
 
 createEnvirLayer("ROOM")
 createCharLayer("GIRL")
-createCustomEnvirLayer("CUSTOM")
+
 createCustomCharLayer()
 createPropsLayer("PROPS")

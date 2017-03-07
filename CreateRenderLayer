@@ -135,8 +135,6 @@ def createCustomEnvirLayer(layerName):
     
     """set render layer visible"""
     rs.switchToLayer(envirLayer)
-    
-createCustomEnvirLayer("CUSTOM")
    
     
 def createCharLayer(layerName):
@@ -176,7 +174,6 @@ def createCharLayer(layerName):
     """set render layer visible"""
     rs.switchToLayer(charLayer)
 
-createCharLayer("GIRL")
 
 def createCustomCharLayer(layerName):
        
@@ -226,45 +223,8 @@ def createCustomCharLayer(layerName):
     """set render layer visible"""
     rs.switchToLayer(charLayer)
     
-createCustomCharLayer("CUSTOM_CHAR")
-    
-    
-def createPropsLayer(layerName):
-        
-    """create render setup instance"""
-    rs = renderSetup.instance()
-    
-    """create and append the render layer"""
-    propsLayer = rs.createRenderLayer(layerName)
-    
-    """create all lights collection"""
-    c_allLights = propsLayer.createCollection("c_AllLights")
-    c_allLights.getSelector().setFilterType(4)
-    c_allLights.getSelector().setPattern("*")
-    
-    """create envir collection"""
-    c_allEnvir = propsLayer.createCollection("c_charAllEnvir")
-    c_allEnvir.getSelector().setFilterType(0)
-    c_allEnvir.getSelector().setPattern("ENVIR*")
-    o_envirVisibility = c_allEnvir.createOverride("charEnvirVisibility", override.AbsOverride.kTypeId)
-    o_envirVisibility.finalize(getListUptoFirstMeshNode("ENVIR")+".primaryVisibility")
-    o_envirVisibility.setAttrValue(0)
-    
-    """create collection to turn off all chars from envir layer"""
-    c_allChar = propsLayer.createCollection("c_envirAllChar")
-    c_allChar.getSelector().setFilterType(0)
-    c_allChar.getSelector().setPattern("CHAR*")
-    o_charVisibility = c_allChar.createOverride("envirCharVisibility", override.AbsOverride.kTypeId)
-    o_charVisibility.finalize(getListUptoFirstMeshNode("CHAR")+".primaryVisibility")
-    o_charVisibility.setAttrValue(0)
-    
-    c_allProps = propsLayer.createCollection("c_allProps")
-    c_allProps.getSelector().setPattern("Props*")
-    o_allPropsVisibility = c_allProps.createOverride("allPropsVisibility", override.AbsOverride.kTypeId)
-    o_allPropsVisibility.finalize("ENVIR"+getListUptoFirstMeshNode("Props")+".primaryVisibility")
-    o_allPropsVisibility.setAttrValue(1)
-
 
 createEnvirLayer("ROOM")
-
-createPropsLayer("PROPS")
+createCharLayer("GIRL")
+createCustomEnvirLayer("CUSTOM_ENVIR")
+createCustomCharLayer("CUSTOM_CHAR")

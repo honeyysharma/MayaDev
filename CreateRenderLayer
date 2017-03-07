@@ -12,14 +12,14 @@ import maya.app.renderSetup.model.renderLayer as renderLayer
 import maya.app.renderSetup.model.override as override
 import maya.app.renderSetup.model.renderLayer as layer
 
-
+"""
 print cmds.selectedNodes()
 nodes = map(lambda x: str(x), cmds.selectedNodes())
 print nodes
 pattern = (",").join(map(lambda x: x+"*", cmds.selectedNodes()))
 print pattern
 
-"""
+
 nodeName = str(node)
 print type(nodeName)
 print nodeName.replace("|","|")
@@ -148,12 +148,11 @@ def createCharLayer(layerName):
     c_allChar.getSelector().setFilterType(0)
     c_allChar.getSelector().setPattern("CHAR*")
     
+    """set render layer visible"""
+    rs.switchToLayer(charLayer)
     
 def createCustomCharLayer(layerName):
-    
-    """get selected node"""    
-    layerName = str(cmds.selectedNodes()[0])
-    
+       
     """create render setup instance"""
     rs = renderSetup.instance()
     
@@ -173,11 +172,26 @@ def createCustomCharLayer(layerName):
     o_envirVisibility.finalize(getListUptoFirstMeshNode("ENVIR")+".primaryVisibility")
     o_envirVisibility.setAttrValue(0)
     
-    
     """create collection to turn off all chars from envir layer"""
-    c_allChar = charLayer.createCollection("c_customcharAllChar")
+    c_allChar = charLayer.createCollection("c_envirAllChar")
     c_allChar.getSelector().setFilterType(0)
-    c_allChar.getSelector().setPattern(layerName+"*")
+    c_allChar.getSelector().setPattern("CHAR*")
+    o_charVisibility = c_allChar.createOverride("envirCharVisibility", override.AbsOverride.kTypeId)
+    o_charVisibility.finalize(getListUptoFirstMeshNode("CHAR")+".primaryVisibility")
+    o_charVisibility.setAttrValue(0)
+    
+    """create collection custom char collection"""
+    c_customChar = charLayer.createCollection("c_customcharAllChar")
+    c_customChar.getSelector().setFilterType(0)
+    c_customChar.getSelector().setPattern((",").join(map(lambda x: x+"*", cmds.selectedNodes())))
+    o_customCharVisibility = c_customChar.createOverride("customCharVisibility", override.AbsOverride.kTypeId)
+    o_customCharVisibility.finalize("CHAR"+getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".primaryVisibility")
+    o_customCharVisibility.setAttrValue(1)
+
+    """set render layer visible"""
+    rs.switchToLayer(charLayer)
+    
+createCustomCharLayer("CUSTOM_CHAR")
     
     
 def createPropsLayer(layerName):
@@ -218,6 +232,4 @@ def createPropsLayer(layerName):
 
 createEnvirLayer("ROOM")
 createCharLayer("GIRL")
-
-createCustomCharLayer()
 createPropsLayer("PROPS")

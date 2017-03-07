@@ -54,6 +54,13 @@ def createEnvirLayer(layerName):
     c_allLights.getSelector().setFilterType(4)
     c_allLights.getSelector().setPattern("*")
     
+    """turn off char lights in envir"""
+    c_offCharLights = envirLayer.createCollection("c_OffCharLights")
+    c_offCharLights.getSelector().setFilterType(4)
+    c_offCharLights.getSelector().setPattern("CHAR_LGT*")
+    o_offCharLgtVisibility = c_offCharLights.createOverride("offCharLgtVisibility", override.AbsOverride.kTypeId)
+    o_offCharLgtVisibility.finalize("CHAR_LGT.visibility")
+    o_offCharLgtVisibility.setAttrValue(0)
     
     """create envir collection"""
     c_allEnvir = envirLayer.createCollection("c_envirAllEnvir")
@@ -78,7 +85,9 @@ def createEnvirLayer(layerName):
     
     """set render layer visible"""
     rs.switchToLayer(envirLayer)
-    
+
+createEnvirLayer("ROOM")    
+
 def createCustomEnvirLayer(layerName):
     """create render setup instance"""
     rs = renderSetup.instance()
@@ -90,6 +99,14 @@ def createCustomEnvirLayer(layerName):
     c_allLights = envirLayer.createCollection("c_AllLights")
     c_allLights.getSelector().setFilterType(4)
     c_allLights.getSelector().setPattern("*")
+    
+    """turn off char lights in envir"""
+    c_offCharLights = envirLayer.createCollection("c_OffCharLights")
+    c_offCharLights.getSelector().setFilterType(4)
+    c_offCharLights.getSelector().setPattern("CHAR_LGT*")
+    o_offCharLgtVisibility = c_offCharLights.createOverride("offCharLgtVisibility", override.AbsOverride.kTypeId)
+    o_offCharLgtVisibility.finalize("CHAR_LGT.visibility")
+    o_offCharLgtVisibility.setAttrValue(0)
     
     """create envir collection"""
     c_allEnvir = envirLayer.createCollection("c_envirAllEnvir")
@@ -134,6 +151,14 @@ def createCharLayer(layerName):
     c_allLights.getSelector().setFilterType(4)
     c_allLights.getSelector().setPattern("*")
     
+    """turn off envir lights in char"""
+    c_offEnvirLights = charLayer.createCollection("c_OffCharLights")
+    c_offEnvirLights.getSelector().setFilterType(4)
+    c_offEnvirLights.getSelector().setPattern("ENV_LGT*")
+    o_offEnvirLgtVisibility = c_offEnvirLights.createOverride("offEnvirLgtVisibility", override.AbsOverride.kTypeId)
+    o_offEnvirLgtVisibility.finalize("ENV_LGT.visibility")
+    o_offEnvirLgtVisibility.setAttrValue(0)
+    
     """create envir collection"""
     c_allEnvir = charLayer.createCollection("c_charAllEnvir")
     c_allEnvir.getSelector().setFilterType(0)
@@ -150,7 +175,9 @@ def createCharLayer(layerName):
     
     """set render layer visible"""
     rs.switchToLayer(charLayer)
-    
+
+createCharLayer("GIRL")
+
 def createCustomCharLayer(layerName):
        
     """create render setup instance"""
@@ -163,6 +190,14 @@ def createCustomCharLayer(layerName):
     c_allLights = charLayer.createCollection("c_AllLights")
     c_allLights.getSelector().setFilterType(4)
     c_allLights.getSelector().setPattern("*")
+   
+    """turn off envir lights in char"""
+    c_offEnvirLights = charLayer.createCollection("c_OffCharLights")
+    c_offEnvirLights.getSelector().setFilterType(4)
+    c_offEnvirLights.getSelector().setPattern("ENV_LGT*")
+    o_offEnvirLgtVisibility = c_offEnvirLights.createOverride("offEnvirLgtVisibility", override.AbsOverride.kTypeId)
+    o_offEnvirLgtVisibility.finalize("ENV_LGT.visibility")
+    o_offEnvirLgtVisibility.setAttrValue(0)
     
     """create envir collection"""
     c_allEnvir = charLayer.createCollection("c_charAllEnvir")
@@ -231,5 +266,5 @@ def createPropsLayer(layerName):
 
 
 createEnvirLayer("ROOM")
-createCharLayer("GIRL")
+
 createPropsLayer("PROPS")

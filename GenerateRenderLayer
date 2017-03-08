@@ -12,24 +12,6 @@ import maya.app.renderSetup.model.renderLayer as renderLayer
 import maya.app.renderSetup.model.override as override
 import maya.app.renderSetup.model.renderLayer as layer
 
-"""
-print cmds.selectedNodes()
-nodes = map(lambda x: str(x), cmds.selectedNodes())
-print nodes
-pattern = (",").join(map(lambda x: x+"*", cmds.selectedNodes()))
-print pattern
-
-
-nodeName = str(node)
-print type(nodeName)
-print nodeName.replace("|","|")
-
-print cmds.ls(node, dag=1, sn=1, showType=1)
-print cmds.listRelatives(node, allParents=True)
-"""
-
-
-#print cmds.listRelatives(cmds.selectedNodes()[0], children=1)
 
 class Layer(object):
     def __init__(self, layerName):
@@ -107,13 +89,6 @@ class EnvirLayer(Layer):
         o_customEnvirVisibility.finalize("ENVIR"+getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".primaryVisibility")
         o_customEnvirVisibility.setAttrValue(1)
 
-layer = EnvirLayer("Envir")
-layer.createCollectionForAllLights()
-layer.turnOffCharLights()
-layer.turnOffAllChar()
-layer.createAllEnvirCollection()
-layer.switchToLayer()
-
 class CharLayer(Layer):
     
     def __init__(self, layerName):
@@ -128,18 +103,52 @@ class CharLayer(Layer):
         o_offEnvirLgtVisibility.finalize("ENV_LGT.visibility")
         o_offEnvirLgtVisibility.setAttrValue(0)
         
-    def createCustomCharCollection(layer):
+    def createCustomCharCollection(self):
         """create collection custom char collection"""
-        c_customChar = self.layer.createCollection("c_customcharAllChar")
+        c_customChar = self.layer.createCollection("c_customCharAllChar")
         c_customChar.getSelector().setFilterType(0)
         c_customChar.getSelector().setPattern((",").join(map(lambda x: x+"*", cmds.selectedNodes())))
         o_customCharVisibility = c_customChar.createOverride("customCharVisibility", override.AbsOverride.kTypeId)
         o_customCharVisibility.finalize("CHAR"+getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".primaryVisibility")
         o_customCharVisibility.setAttrValue(1)
+        
+def createEnvirLayer(layerName):
+    layer = EnvirLayer(layerName)
+    layer.createCollectionForAllLights()
+    layer.turnOffCharLights()
+    layer.turnOffAllChar()
+    layer.createAllEnvirCollection()
+    layer.switchToLayer()
 
-layer = CharLayer("Char")
-layer.createCollectionForAllLights()
-layer.turnOffEnvirLights()
-layer.turnOffAllEnvir()
-layer.createAllCharCollection()
-layer.switchToLayer()
+def createCharLayer(layerName):
+    layer = CharLayer(layerName)
+    layer.createCollectionForAllLights()
+    layer.turnOffEnvirLights()
+    layer.turnOffAllEnvir()
+    layer.createAllCharCollection()
+    layer.switchToLayer()
+    
+def createCustomEnvirLayer(layerName):
+    layer = EnvirLayer(layerName)
+    layer.createCollectionForAllLights()
+    layer.turnOffCharLights()
+    layer.turnOffAllEnvir()
+    layer.createCustomEnvirCollection()
+    layer.turnOffAllChar()
+    layer.switchToLayer()
+    
+def createCustomCharLayer(layerName):
+    layer = CharLayer(layerName)
+    layer.createCollectionForAllLights()
+    layer.turnOffEnvirLights()
+    layer.turnOffAllEnvir()
+    layer.turnOffAllChar()
+    layer.createCustomCharCollection()
+    layer.switchToLayer()
+    
+#Check for the parent in custom rig selection
+#If the parent and selection type are different then through message.
+createEnvirLayer("ENVIR")
+createCharLayer("CHAR")
+createCustomEnvirLayer("Props")
+createCustomCharLayer("GIRL")

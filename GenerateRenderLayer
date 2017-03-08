@@ -1,0 +1,145 @@
+'''
+Script to test automation of render layers setup
+@author: sharmah
+'''
+
+##import render setup and maya commands modules
+import maya.app.renderSetup.model.renderSetup as renderSetup
+import maya.app.renderSetup.model.override as override
+import maya.app.renderSetup.model.selector as selector
+import maya.app.renderSetup.model.collection as collection
+import maya.app.renderSetup.model.renderLayer as renderLayer
+import maya.app.renderSetup.model.override as override
+import maya.app.renderSetup.model.renderLayer as layer
+
+"""
+print cmds.selectedNodes()
+nodes = map(lambda x: str(x), cmds.selectedNodes())
+print nodes
+pattern = (",").join(map(lambda x: x+"*", cmds.selectedNodes()))
+print pattern
+
+
+nodeName = str(node)
+print type(nodeName)
+print nodeName.replace("|","|")
+
+print cmds.ls(node, dag=1, sn=1, showType=1)
+print cmds.listRelatives(node, allParents=True)
+"""
+
+
+#print cmds.listRelatives(cmds.selectedNodes()[0], children=1)
+
+class Layer(object):
+    def __init__(self, layerName):
+        self.layerName = layerName
+        self.renderSetupInstance = renderSetup.instance()
+        self.layer = self.renderSetupInstance.createRenderLayer(self.layerName)
+        
+    def getListUptoFirstMeshNode(self,groupName):
+        newList = []
+        groupNodes = cmds.ls(groupName, dag=1)
+        for node in groupNodes:
+            newList.append(node)
+            if cmds.nodeType(node) == 'mesh':
+                break
+            
+        return ("".join(map((lambda node: '|'+ node), newList)))
+        
+    def createCollectionForAllLights(self):
+        c_allLights = self.layer.createCollection("c_AllLights")
+        c_allLights.getSelector().setFilterType(4)
+        c_allLights.getSelector().setPattern("*")
+        
+    def createAllEnvirCollection(self):
+        """create envir collection"""
+        c_allEnvir = self.layer.createCollection("c_envirAllEnvir")
+        c_allEnvir.getSelector().setFilterType(0)
+        c_allEnvir.getSelector().setPattern("ENVIR*")
+        return c_allEnvir
+        
+    def createAllCharCollection(self):
+        """create char collection"""
+        c_allChar = self.layer.createCollection("c_charAllChar")
+        c_allChar.getSelector().setFilterType(0)
+        c_allChar.getSelector().setPattern("CHAR*")
+        return c_allChar
+        
+    def turnOffAllChar(self):
+        """create collection to turn off all chars"""
+        collection = self.createAllCharCollection()
+        o_charVisibility = collection.createOverride("CharVisibility", override.AbsOverride.kTypeId)
+        o_charVisibility.finalize(getListUptoFirstMeshNode("CHAR")+".primaryVisibility")
+        o_charVisibility.setAttrValue(0)
+        
+    def turnOffAllEnvir(self):
+        """create collection to turn off all envir"""
+        collecion = self.createAllEnvirCollection()
+        o_envirVisibility = collecion.createOverride("EnvirVisibility", override.AbsOverride.kTypeId)
+        o_envirVisibility.finalize(getListUptoFirstMeshNode("ENVIR")+".primaryVisibility")
+        o_envirVisibility.setAttrValue(0)
+        
+    def switchToLayer(self):
+        """set render layer visible"""
+        self.renderSetupInstance.switchToLayer(self.layer)
+        
+class EnvirLayer(Layer):
+    
+    def __init__(self, layerName):
+        super(EnvirLayer, self).__init__(layerName)
+        
+    def turnOffCharLights(self):
+        """turn off char lights in envir"""
+        c_offCharLights = self.layer.createCollection("c_OffCharLights")
+        c_offCharLights.getSelector().setFilterType(4)
+        c_offCharLights.getSelector().setPattern("CHAR_LGT*")
+        o_offCharLgtVisibility = c_offCharLights.createOverride("offCharLgtVisibility", override.AbsOverride.kTypeId)
+        o_offCharLgtVisibility.finalize("CHAR_LGT.visibility")
+        o_offCharLgtVisibility.setAttrValue(0)
+        
+    def createCustomEnvirCollection(self):
+        """create custom envir collection"""
+        c_customEnvir = self.layer.createCollection("c_envirCustomEnvir")
+        c_customEnvir.getSelector().setFilterType(0)
+        c_customEnvir.getSelector().setPattern((",").join(map(lambda x: x+"*", cmds.selectedNodes())))
+        o_customEnvirVisibility = c_customEnvir.createOverride("customEnvirVisibility", override.AbsOverride.kTypeId)
+        o_customEnvirVisibility.finalize("ENVIR"+getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".primaryVisibility")
+        o_customEnvirVisibility.setAttrValue(1)
+
+layer = EnvirLayer("Envir")
+layer.createCollectionForAllLights()
+layer.turnOffCharLights()
+layer.turnOffAllChar()
+layer.createAllEnvirCollection()
+layer.switchToLayer()
+
+class CharLayer(Layer):
+    
+    def __init__(self, layerName):
+        super(CharLayer, self).__init__(layerName)
+        
+    def turnOffEnvirLights(self):
+        """turn off envir lights in char"""
+        c_offEnvirLights = self.layer.createCollection("c_OffEnvirLights")
+        c_offEnvirLights.getSelector().setFilterType(4)
+        c_offEnvirLights.getSelector().setPattern("ENV_LGT*")
+        o_offEnvirLgtVisibility = c_offEnvirLights.createOverride("offEnvirLgtVisibility", override.AbsOverride.kTypeId)
+        o_offEnvirLgtVisibility.finalize("ENV_LGT.visibility")
+        o_offEnvirLgtVisibility.setAttrValue(0)
+        
+    def createCustomCharCollection(layer):
+        """create collection custom char collection"""
+        c_customChar = self.layer.createCollection("c_customcharAllChar")
+        c_customChar.getSelector().setFilterType(0)
+        c_customChar.getSelector().setPattern((",").join(map(lambda x: x+"*", cmds.selectedNodes())))
+        o_customCharVisibility = c_customChar.createOverride("customCharVisibility", override.AbsOverride.kTypeId)
+        o_customCharVisibility.finalize("CHAR"+getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".primaryVisibility")
+        o_customCharVisibility.setAttrValue(1)
+
+layer = CharLayer("Char")
+layer.createCollectionForAllLights()
+layer.turnOffEnvirLights()
+layer.turnOffAllEnvir()
+layer.createAllCharCollection()
+layer.switchToLayer()

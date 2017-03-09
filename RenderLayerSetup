@@ -1,0 +1,114 @@
+import sys
+from PyQt4 import QtCore, QtGui
+
+class RenderLayerSetup(QtGui.QWidget):
+    
+    def __init__ (self):
+        super(RenderLayerSetup, self).__init__ ()
+        #self.customLayerGridLayout = None
+        self.initUI()
+        
+    def initUI(self):
+        #main layout
+        vbox = QtGui.QVBoxLayout()
+        
+        #top frame
+        topFrame = QtGui.QFrame()
+        topFrame.setFrameShape(QtGui.QFrame.StyledPanel)
+        
+        #bottom frame
+        bottomFrame = QtGui.QFrame()
+        bottomFrame.setFrameShape(QtGui.QFrame.StyledPanel)
+        
+        #split window and add frame
+        splitter = QtGui.QSplitter(QtCore.Qt.Vertical)
+        splitter.addWidget(topFrame)
+        splitter.addWidget(bottomFrame)
+        
+        #add splitter to main layout
+        vbox.addWidget(splitter)
+        
+        #create default layer buttons
+        self.btnEnvir = QtGui.QPushButton('ENVIR', self)
+        self.btnEnvir.move(20, 20)
+        self.btnEnvir.clicked.connect(self.showCustomLayerWidget)
+        
+        self.btnChar = QtGui.QPushButton('CHAR', self)
+        self.btnChar.move(20, 20)
+        self.btnChar.clicked.connect(self.hideCustomLayerWidget)
+        
+        self.btnCustom = QtGui.QPushButton('Custom', self)
+        self.btnCustom.move(20, 20)
+        self.btnCustom.clicked.connect(self.showCustomLayerWidget)
+        
+        
+        self.lblLayerName = QtGui.QLabel('Layer Name:')
+        
+        self.leLayerName = QtGui.QLineEdit()
+        self.leLayerName.setPlaceholderText("Layer")
+        
+        self.lblLayerType = QtGui.QLabel('Layer Type:')
+        
+        self.comboLayerType = QtGui.QComboBox()
+        self.comboLayerType.addItems(['Envir', 'Char'])
+        
+        self.btnAddLayer = QtGui.QPushButton('Add', self)
+        self.btnAddLayer.move(20, 20)
+        self.btnAddLayer.clicked.connect(self.showDialog)
+        
+        #self.btnCancelCustomLayer = QtGui.QPushButton('Cancel', self)
+        #self.btnCancelCustomLayer.move(20, 20)
+        #self.btnCancelCustomLayer.clicked.connect(self.hideCustomLayerWidget)
+        
+        #create grid layout to add buttons
+        defaultBtnGridLayout = QtGui.QGridLayout()
+        defaultBtnGridLayout.addWidget(self.btnEnvir, 0, 0)
+        defaultBtnGridLayout.addWidget(self.btnChar, 0, 1)
+        
+        #set grid layout for top frame
+        topFrame.setLayout(defaultBtnGridLayout)
+        
+        #grid layout for adding custom widgets
+        self.customLayerGridLayout = QtGui.QGridLayout()
+        self.customLayerGridLayout.addWidget(self.lblLayerName, 0, 0)
+        self.customLayerGridLayout.addWidget(self.leLayerName, 0, 1)
+        self.customLayerGridLayout.addWidget(self.lblLayerType, 1, 0)
+        self.customLayerGridLayout.addWidget(self.comboLayerType, 1, 1)
+        #self.customLayerGridLayout.addWidget(self.btnCancelCustomLayer, 2, 0)
+        self.customLayerGridLayout.addWidget(self.btnAddLayer, 2, 1)
+        
+        #vertical layout for bottom frame
+        vboxCustom = QtGui.QVBoxLayout()
+        vboxCustom.addWidget(self.btnCustom)
+        vboxCustom.addLayout(self.customLayerGridLayout)
+        
+        #set vertical layout for bottom frame
+        bottomFrame.setLayout(vboxCustom)
+        
+        self.setLayout(vbox)
+        self.setGeometry(300, 300, 300, 200)
+        self.setWindowTitle('Render Layer Setup')
+        self.show()
+        
+    def showDialog(self):
+        text, ok = QtGui.QInputDialog.getText(self, 'Input Dialog',
+        'Enter your name:')
+        if ok:
+            print "Test"
+   
+    def showCustomLayerWidget(self):
+        self.showAnimation = QtCore.QPropertyAnimation(self.customLayerGridLayout, "maximumHeight")
+        self.showAnimation.setDuration(1000)
+        self.showAnimation.setStartValue(500)
+        self.showAnimation.setEndValue(0)
+        self.showAnimation.start()
+       
+    def hideCustomLayerWidget(self):
+        self.showAnimation = QtCore.QPropertyAnimation(self.customLayerGridLayout, "maximumHeight")
+        self.showAnimation.setDuration(1000)
+        self.showAnimation.setStartValue(0)
+        self.showAnimation.setEndValue(500)
+        self.showAnimation.start()
+        
+        
+test = RenderLayerSetup()

@@ -1,0 +1,46 @@
+import sys
+
+path = "/homes/sharmah/maya/projects/RenderSetup2016/scripts/"
+if path not in sys.path:
+    sys.path.append(path)
+
+import RenderLayers
+reload(RenderLayers)
+
+class RenderLayerController(object):
+    def __init__(self):
+        pass
+        
+    def createEnvirLayer(self, layerName):
+        layer = EnvirLayer(layerName)
+        layer.createCollectionForAllLights()
+        layer.turnOffCharLights()
+        layer.turnOffAllChar()
+        layer.createAllEnvirCollection()
+        layer.switchToLayer()
+    
+    def createCharLayer(self, layerName):
+        layer = CharLayer(layerName)
+        layer.createCollectionForAllLights()
+        layer.turnOffEnvirLights()
+        layer.turnOffAllEnvir()
+        layer.createAllCharCollection()
+        layer.switchToLayer()
+        
+    def createCustomEnvirLayer(self, layerName):
+        layer = EnvirLayer(layerName)
+        layer.createCollectionForAllLights()
+        layer.turnOffCharLights()
+        layer.turnOffAllEnvir()
+        layer.createCustomEnvirCollection()
+        layer.turnOffAllChar()
+        layer.switchToLayer()
+        
+    def createCustomCharLayer(self, layerName):
+        layer = CharLayer(layerName)
+        layer.createCollectionForAllLights()
+        layer.turnOffEnvirLights()
+        layer.turnOffAllEnvir()
+        layer.turnOffAllChar()
+        layer.createCustomCharCollection()
+        layer.switchToLayer()

@@ -1,10 +1,13 @@
-import sys
 from PyQt4 import QtCore, QtGui
+from RenderLayerController import RenderLayerController
 
 class CustomLayerSetup(QtGui.QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, renderSetupController):
         QtGui.QWidget.__init__(self, parent)
+        self.renderSetupController = renderSetupController
+        self.generateUI()
         
+    def generateUI(self):
         self.lblLayerName = QtGui.QLabel('Layer Name:')
         
         self.leLayerName = QtGui.QLineEdit()
@@ -17,7 +20,7 @@ class CustomLayerSetup(QtGui.QWidget):
         
         self.btnAddLayer = QtGui.QPushButton('Add', self)
         self.btnAddLayer.move(20, 20)
-        #self.btnAddLayer.clicked.connect(self.showDialog)
+        self.btnAddLayer.clicked.connect(self.createCustomLayer)
         
         #grid layout for adding custom widgets
         self.customLayerGridLayout = QtGui.QGridLayout()
@@ -25,10 +28,18 @@ class CustomLayerSetup(QtGui.QWidget):
         self.customLayerGridLayout.addWidget(self.leLayerName, 0, 1)
         self.customLayerGridLayout.addWidget(self.lblLayerType, 1, 0)
         self.customLayerGridLayout.addWidget(self.comboLayerType, 1, 1)
-        #self.customLayerGridLayout.addWidget(self.btnCancelCustomLayer, 2, 0)
         self.customLayerGridLayout.addWidget(self.btnAddLayer, 2, 1)
         
         self.setLayout(self.customLayerGridLayout)
+            
+    def createCustomLayer(self):
+        layerType = str(self.comboLayerType.currentText())
+        layerName = str(self.leLayerName.text())
+     
+        if layerType == "Envir":
+            self.renderSetupController.createCustomEnvirLayer(layerName)
+        else:
+            self.renderSetupController.createCustomCharLayer(layerName)
         
 
 class RenderLayerSetup(QtGui.QWidget):
@@ -36,6 +47,7 @@ class RenderLayerSetup(QtGui.QWidget):
     def __init__ (self):
         super(RenderLayerSetup, self).__init__ ()
         self.showCustomLayer = 0
+        self.renderSetupController = RenderSetupController()
         self.initUI()
         
     def initUI(self):
@@ -61,11 +73,11 @@ class RenderLayerSetup(QtGui.QWidget):
         #create default layer buttons
         self.btnEnvir = QtGui.QPushButton('ENVIR', self)
         self.btnEnvir.move(20, 20)
-        self.btnEnvir.clicked.connect(self.toggleAnimation)
+        self.btnEnvir.clicked.connect(self.createEnvirLayer)
         
         self.btnChar = QtGui.QPushButton('CHAR', self)
         self.btnChar.move(20, 20)
-        self.btnChar.clicked.connect(self.toggleAnimation)
+        self.btnChar.clicked.connect(self.createCharLayer)
         
         self.btnCustom = QtGui.QPushButton('Custom', self)
         self.btnCustom.move(20, 20)
@@ -83,7 +95,7 @@ class RenderLayerSetup(QtGui.QWidget):
         #set grid layout for top frame
         topFrame.setLayout(defaultBtnGridLayout)
         
-        self.customLayer = CustomLayerSetup(self)
+        self.customLayer = CustomLayerSetup(self, self.renderSetupController)
         self.toggleAnimation()
         #vertical layout for bottom frame
         vboxCustom = QtGui.QVBoxLayout()
@@ -94,7 +106,7 @@ class RenderLayerSetup(QtGui.QWidget):
         bottomFrame.setLayout(vboxCustom)
         
         self.setLayout(vbox)
-        self.setGeometry(300, 300, 300, 200)
+        self.setGeometry(300, 300, 300, 100)
         self.setWindowTitle('Render Layer Setup')
         self.show()
         
@@ -119,6 +131,11 @@ class RenderLayerSetup(QtGui.QWidget):
             self.hideAnimation.setEndValue(100)
             self.hideAnimation.start()
             self.showCustomLayer = 0
+   
+    def createEnvirLayer(self):
+        self.renderSetupController.createEnvirLayer("ENVIR")
         
+    def createCharLayer(self):
+        self.renderSetupController.createEnvirLayer("CHAR")
         
 test = RenderLayerSetup()

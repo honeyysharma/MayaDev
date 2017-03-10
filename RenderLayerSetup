@@ -2,9 +2,9 @@ from PyQt4 import QtCore, QtGui
 from RenderLayerController import RenderLayerController
 
 class CustomLayerSetup(QtGui.QWidget):
-    def __init__(self, parent, renderSetupController):
+    def __init__(self, parent, renderLayerController):
         QtGui.QWidget.__init__(self, parent)
-        self.renderSetupController = renderSetupController
+        self.renderLayerController = renderLayerController
         self.generateUI()
         
     def generateUI(self):
@@ -37,9 +37,9 @@ class CustomLayerSetup(QtGui.QWidget):
         layerName = str(self.leLayerName.text())
      
         if layerType == "Envir":
-            self.renderSetupController.createCustomEnvirLayer(layerName)
+            self.renderLayerController.createCustomEnvirLayer(layerName)
         else:
-            self.renderSetupController.createCustomCharLayer(layerName)
+            self.renderLayerController.createCustomCharLayer(layerName)
         
 
 class RenderLayerSetup(QtGui.QWidget):
@@ -47,7 +47,7 @@ class RenderLayerSetup(QtGui.QWidget):
     def __init__ (self):
         super(RenderLayerSetup, self).__init__ ()
         self.showCustomLayer = 0
-        self.renderSetupController = RenderSetupController()
+        self.renderLayerController = RenderLayerController()
         self.initUI()
         
     def initUI(self):
@@ -95,7 +95,7 @@ class RenderLayerSetup(QtGui.QWidget):
         #set grid layout for top frame
         topFrame.setLayout(defaultBtnGridLayout)
         
-        self.customLayer = CustomLayerSetup(self, self.renderSetupController)
+        self.customLayer = CustomLayerSetup(self, self.renderLayerController)
         self.toggleAnimation()
         #vertical layout for bottom frame
         vboxCustom = QtGui.QVBoxLayout()
@@ -109,33 +109,27 @@ class RenderLayerSetup(QtGui.QWidget):
         self.setGeometry(300, 300, 300, 100)
         self.setWindowTitle('Render Layer Setup')
         self.show()
-        
-    def showDialog(self):
-        text, ok = QtGui.QInputDialog.getText(self, 'Input Dialog',
-        'Enter your name:')
-        if ok:
-            print "Test"
    
     def toggleAnimation(self):
-        self.hideAnimation = QtCore.QPropertyAnimation(self.customLayer, "maximumHeight")
+        self.animation = QtCore.QPropertyAnimation(self.customLayer, "maximumHeight")
         
         if self.showCustomLayer == 0:
-            self.hideAnimation.setDuration(300)
-            self.hideAnimation.setStartValue(100)
-            self.hideAnimation.setEndValue(0)
-            self.hideAnimation.start()
+            self.animation.setDuration(300)
+            self.animation.setStartValue(100)
+            self.animation.setEndValue(0)
+            self.animation.start()
             self.showCustomLayer = 1
         else:
-            self.hideAnimation.setDuration(300)
-            self.hideAnimation.setStartValue(0)
-            self.hideAnimation.setEndValue(100)
-            self.hideAnimation.start()
+            self.animation.setDuration(300)
+            self.animation.setStartValue(0)
+            self.animation.setEndValue(100)
+            self.animation.start()
             self.showCustomLayer = 0
    
     def createEnvirLayer(self):
-        self.renderSetupController.createEnvirLayer("ENVIR")
+        self.renderLayerController.createEnvirLayer("ENVIR")
         
     def createCharLayer(self):
-        self.renderSetupController.createEnvirLayer("CHAR")
+        self.renderLayerController.createCharLayer("CHAR")
         
 test = RenderLayerSetup()

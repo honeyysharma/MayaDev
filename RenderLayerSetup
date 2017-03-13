@@ -16,7 +16,7 @@ class CustomLayerSetup(QtGui.QWidget):
         self.lblLayerType = QtGui.QLabel('Layer Type:')
         
         self.comboLayerType = QtGui.QComboBox()
-        self.comboLayerType.addItems(['Envir', 'Char'])
+        self.comboLayerType.addItems(['ENVIR', 'CHAR'])
         
         self.btnAddLayer = QtGui.QPushButton('Add', self)
         self.btnAddLayer.move(20, 20)
@@ -34,12 +34,18 @@ class CustomLayerSetup(QtGui.QWidget):
             
     def createCustomLayer(self):
         layerType = str(self.comboLayerType.currentText())
-        layerName = str(self.leLayerName.text())
-     
-        if layerType == "Envir":
-            self.renderLayerController.createCustomEnvirLayer(layerName)
+        layerName = str(self.leLayerName.text()).upper()
+        parentList = list(set(map(lambda node: str(node).strip("|").split("|")[0], cmds.selectedNodes())))
+        if layerType == "ENVIR":
+            if "CHAR" in parentList:
+                QtGui.QMessageBox.information(self, "Alert", "CHAR type asset selected to create ENVIR layer!")
+            else:
+                self.renderLayerController.createCustomEnvirLayer(layerName)
         else:
-            self.renderLayerController.createCustomCharLayer(layerName)
+            if "ENVIR" in parentList:
+                QtGui.QMessageBox.information(self, "Alert", "ENVIR type asset selected to create ENVIR layer!")
+            else:
+                self.renderLayerController.createCustomCharLayer(layerName)
         
 
 class RenderLayerSetup(QtGui.QWidget):

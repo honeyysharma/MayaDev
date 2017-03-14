@@ -22,6 +22,7 @@ class Layer(object):
             if cmds.nodeType(node) == 'mesh':
                 break
             
+        newList = str(groupName).strip("|").split("|")[:-1] + newList
         return ("".join(map((lambda node: '|'+ node), newList)))
         
     def createCollectionForAllLights(self):
@@ -80,12 +81,11 @@ class EnvirLayer(Layer):
         
     def createCustomEnvirCollection(self):
         """create custom envir collection"""
-        print self.getListUptoFirstMeshNode(cmds.selectedNodes()[0])
         c_customEnvir = self.layer.createCollection("c_envirCustomEnvir")
         c_customEnvir.getSelector().setFilterType(0)
         c_customEnvir.getSelector().setPattern((",").join(map(lambda x: x+"*", cmds.selectedNodes())))
         o_customEnvirVisibility = c_customEnvir.createOverride("customEnvirVisibility", override.AbsOverride.kTypeId)
-        o_customEnvirVisibility.finalize("ENVIR"+self.getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".primaryVisibility")
+        o_customEnvirVisibility.finalize(self.getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".primaryVisibility")
         o_customEnvirVisibility.setAttrValue(1)
 
 class CharLayer(Layer):
@@ -108,7 +108,7 @@ class CharLayer(Layer):
         c_customChar.getSelector().setFilterType(0)
         c_customChar.getSelector().setPattern((",").join(map(lambda x: x+"*", cmds.selectedNodes())))
         o_customCharVisibility = c_customChar.createOverride("customCharVisibility", override.AbsOverride.kTypeId)
-        o_customCharVisibility.finalize("CHAR"+self.getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".primaryVisibility")
+        o_customCharVisibility.finalize(self.getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".primaryVisibility")
         o_customCharVisibility.setAttrValue(1)
     
 #Check for the parent in custom rig selection
@@ -137,3 +137,19 @@ print cmds.listRelatives(node, allParents=True)
 
 
 #print cmds.listRelatives(cmds.selectedNodes()[0], children=1)
+
+"""
+def getListUptoFirstMeshNode(groupName):
+    newList = []
+    groupNodes = cmds.ls(groupName, dag=1)
+    print groupNodes
+    for node in groupNodes:
+        newList.append(node)
+        if cmds.nodeType(node) == 'mesh':
+            break
+    
+    newList = str(groupName).strip("|").split("|")[:-1] + newList   
+    return ("".join(map((lambda node: '|'+ node), newList)))
+    
+print getListUptoFirstMeshNode("ENVIR")
+"""

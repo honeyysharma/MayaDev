@@ -44,11 +44,11 @@ class Layer(object):
         c_allChar.getSelector().setPattern("CHAR*")
         return c_allChar
         
-    def turnOffAllChar(self, holdOut):
+    def turnOffAllChar(self, isCutoutChecked):
         """create collection to turn off all chars"""
         collection = self.createAllCharCollection()
         o_charVisibility = collection.createOverride("CharVisibility", override.AbsOverride.kTypeId)
-        if holdOut == "True":
+        if isCutoutChecked == True:
             o_charVisibility.finalize(self.getListUptoFirstMeshNode("CHAR")+".aiMatte")
             o_charVisibility.setAttrValue(1)
         else:
@@ -56,11 +56,11 @@ class Layer(object):
             o_charVisibility.setAttrValue(0)
         
         
-    def turnOffAllEnvir(self, holdOut):
+    def turnOffAllEnvir(self, isCutoutChecked):
         """create collection to turn off all envir"""
         collecion = self.createAllEnvirCollection()
         o_envirVisibility = collecion.createOverride("EnvirVisibility", override.AbsOverride.kTypeId)
-        if holdOut == "True":
+        if isCutoutChecked == True:
             o_envirVisibility.finalize(self.getListUptoFirstMeshNode("ENVIR")+".aiMatte")
             o_envirVisibility.setAttrValue(1)
         else:
@@ -89,14 +89,19 @@ class EnvirLayer(Layer):
         o_offCharLgtVisibility.finalize("CHAR_LGT.visibility")
         o_offCharLgtVisibility.setAttrValue(0)
         
-    def createCustomEnvirCollection(self):
+    def createCustomEnvirCollection(self, isCutoutChecked):
         """create custom envir collection"""
         c_customEnvir = self.layer.createCollection("c_envirCustomEnvir")
         c_customEnvir.getSelector().setFilterType(0)
         c_customEnvir.getSelector().setPattern((",").join(map(lambda x: x+"*", cmds.selectedNodes())))
         o_customEnvirVisibility = c_customEnvir.createOverride("customEnvirVisibility", override.AbsOverride.kTypeId)
-        o_customEnvirVisibility.finalize(self.getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".aiMatte")
-        o_customEnvirVisibility.setAttrValue(0)
+        
+        if isCutoutChecked == True:
+            o_customEnvirVisibility.finalize(self.getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".aiMatte")
+            o_customEnvirVisibility.setAttrValue(0)
+        else:
+            o_customEnvirVisibility.finalize(self.getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".primaryVisibility")
+            o_customEnvirVisibility.setAttrValue(1)
 
 class CharLayer(Layer):
     
@@ -112,14 +117,19 @@ class CharLayer(Layer):
         o_offEnvirLgtVisibility.finalize("ENV_LGT.visibility")
         o_offEnvirLgtVisibility.setAttrValue(0)
         
-    def createCustomCharCollection(self):
+    def createCustomCharCollection(self, isCutoutChecked):
         """create collection custom char collection"""
         c_customChar = self.layer.createCollection("c_customCharAllChar")
         c_customChar.getSelector().setFilterType(0)
         c_customChar.getSelector().setPattern((",").join(map(lambda x: x+"*", cmds.selectedNodes())))
         o_customCharVisibility = c_customChar.createOverride("customCharVisibility", override.AbsOverride.kTypeId)
-        o_customCharVisibility.finalize(self.getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".aiMatte")
-        o_customCharVisibility.setAttrValue(0)
+        
+        if isCutoutChecked == True:
+            o_customCharVisibility.finalize(self.getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".aiMatte")
+            o_customCharVisibility.setAttrValue(0)
+        else:
+            o_customCharVisibility.finalize(self.getListUptoFirstMeshNode(cmds.selectedNodes()[0])+".primaryVisibility")
+            o_customCharVisibility.setAttrValue(1)
     
 #Check for the parent in custom rig selection
 #If the parent and selection type are different then through message.
@@ -129,17 +139,19 @@ class CharLayer(Layer):
 #createCustomCharLayer("GIRL")
 
 """
-def createCustomCharLayer(layerName):
+def createCustomCharLayer(layerName, isCutoutChecked):
     layer = CharLayer(layerName)
     layer.createCollectionForAllLights()
     layer.turnOffEnvirLights()
-    layer.turnOffAllEnvir("True")
+    layer.turnOffAllEnvir(True)
+    
     #toggle only Char cutout
-    layer.turnOffAllChar("True")
-    layer.createCustomCharCollection()
+    layer.turnOffAllChar(isCutoutChecked)
+    layer.createCustomCharCollection(isCutoutChecked)
+    
     layer.switchToLayer()
 
-createCustomCharLayer("TEST")
+createCustomCharLayer("TEST", True)
 """
 
 """

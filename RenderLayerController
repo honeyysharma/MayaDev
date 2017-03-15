@@ -16,7 +16,7 @@ class RenderLayerController(object):
         layer = EnvirLayer(layerName)
         layer.createCollectionForAllLights()
         layer.turnOffCharLights()
-        layer.turnOffAllChar("False")
+        layer.turnOffAllChar(False)
         layer.createAllEnvirCollection()
         layer.switchToLayer()
     
@@ -24,30 +24,30 @@ class RenderLayerController(object):
         layer = CharLayer(layerName)
         layer.createCollectionForAllLights()
         layer.turnOffEnvirLights()
-        layer.turnOffAllEnvir("True")
+        layer.turnOffAllEnvir(True)
         layer.createAllCharCollection()
         layer.switchToLayer()
         
-    def createCustomEnvirLayer(self, layerName):
+    def createCustomEnvirLayer(self, layerName, isCutoutChecked):
         layer = EnvirLayer(layerName)
         layer.createCollectionForAllLights()
         layer.turnOffCharLights()
         
         #toggle only Envir cutout
-        layer.turnOffAllEnvir("True")
+        layer.turnOffAllEnvir(isCutoutChecked)
         
-        layer.createCustomEnvirCollection()
-        layer.turnOffAllChar("False")
+        layer.createCustomEnvirCollection(isCutoutChecked)
+        layer.turnOffAllChar(False)
         layer.switchToLayer()
         
-    def createCustomCharLayer(self, layerName):
+    def createCustomCharLayer(self, layerName, isCutoutChecked):
         layer = CharLayer(layerName)
         layer.createCollectionForAllLights()
         layer.turnOffEnvirLights()
-        layer.turnOffAllEnvir("True")
+        layer.turnOffAllEnvir(True)
         
         #toggle only Char cutout
-        layer.turnOffAllChar("True")
+        layer.turnOffAllChar(isCutoutChecked)
         
-        layer.createCustomCharCollection()
+        layer.createCustomCharCollection(isCutoutChecked)
         layer.switchToLayer()

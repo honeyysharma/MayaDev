@@ -93,7 +93,7 @@ class EnvirLayer(Layer):
         """create custom envir collection"""
         c_customEnvir = self.layer.createCollection("c_envirCustomEnvir")
         c_customEnvir.getSelector().setFilterType(0)
-        c_customEnvir.getSelector().setPattern((",").join(map(lambda x: x+"*", cmds.selectedNodes())))
+        c_customEnvir.getSelector().setPattern((",").join(cmds.selectedNodes()))
         o_customEnvirVisibility = c_customEnvir.createOverride("customEnvirVisibility", override.AbsOverride.kTypeId)
         
         if isCutoutChecked == True:
@@ -121,7 +121,7 @@ class CharLayer(Layer):
         """create collection custom char collection"""
         c_customChar = self.layer.createCollection("c_customCharAllChar")
         c_customChar.getSelector().setFilterType(0)
-        c_customChar.getSelector().setPattern((",").join(map(lambda x: x+"*", cmds.selectedNodes())))
+        c_customChar.getSelector().setPattern((",").join(cmds.selectedNodes()))
         o_customCharVisibility = c_customChar.createOverride("customCharVisibility", override.AbsOverride.kTypeId)
         
         if isCutoutChecked == True:

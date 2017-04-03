@@ -9,7 +9,7 @@ def isGroup(node):
 
 def getAssetList(type):
     topGroupNodes = cmds.ls(assemblies=True)
-    assetNodes = filter(lambda node: isGroup(node), allNodes)
+    assetNodes = filter(lambda node: isGroup(node), topGroupNodes)
     filteredList = []
 
     for node in assetNodes:

@@ -1,33 +1,34 @@
-from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
-from PySide2 import QtWidgets
+from PyQt4 import QtCore, QtGui
 from RenderLayerController import RenderLayerController
+import maya.cmds as cmds
+import sys
 
-class CustomLayerSetup(MayaQWidgetDockableMixin, QtWidgets.QDialog):
+class CustomLayerSetup(QtGui.QWidget):
     def __init__(self, parent, renderLayerController):
-        super(CustomLayerSetup, self).__init__(parent=parent)
+        QtGui.QWidget.__init__(self, parent)
         self.renderLayerController = renderLayerController
         self.generateUI()
         
     def generateUI(self):
-        self.lblLayerName = QtWidgets.QLabel('Layer Name:')
+        self.lblLayerName = QtGui.QLabel('Layer Name:')
         
-        self.leLayerName = QtWidgets.QLineEdit()
+        self.leLayerName = QtGui.QLineEdit()
         self.leLayerName.setPlaceholderText("Layer")
         
-        self.lblLayerType = QtWidgets.QLabel('Layer Type:')
+        self.lblLayerType = QtGui.QLabel('Layer Type:')
         
-        self.comboLayerType = QtWidgets.QComboBox()
+        self.comboLayerType = QtGui.QComboBox()
         self.comboLayerType.addItems(['ENVIR', 'CHAR'])
         
-        self.cutOutCheckBox = QtWidgets.QCheckBox("With Cutouts")
+        self.cutOutCheckBox = QtGui.QCheckBox("With Cutouts")
         self.cutOutCheckBox.setChecked(False)
         
-        self.btnAddLayer = QtWidgets.QPushButton('Add', self)
+        self.btnAddLayer = QtGui.QPushButton('Add', self)
         self.btnAddLayer.move(20, 20)
         self.btnAddLayer.clicked.connect(self.createCustomLayer)
         
         #grid layout for adding custom widgets
-        self.customLayerGridLayout = QtWidgets.QGridLayout()
+        self.customLayerGridLayout = QtGui.QGridLayout()
         self.customLayerGridLayout.addWidget(self.lblLayerName, 0, 0)
         self.customLayerGridLayout.addWidget(self.leLayerName, 0, 1)
         self.customLayerGridLayout.addWidget(self.lblLayerType, 1, 0)
@@ -39,7 +40,7 @@ class CustomLayerSetup(MayaQWidgetDockableMixin, QtWidgets.QDialog):
             
     def createCustomLayer(self):
         if cmds.selectedNodes() is None:
-            QtWidgets.QMessageBox.information(self, "Alert", "Please select assets in the Outliner!")    
+            QtGui.QMessageBox.information(self, "Alert", "Please select assets in the Outliner!")    
         else:
             layerType = str(self.comboLayerType.currentText())
             layerName = str(self.leLayerName.text()).upper()
@@ -47,62 +48,67 @@ class CustomLayerSetup(MayaQWidgetDockableMixin, QtWidgets.QDialog):
             
             if layerType == "ENVIR":
                 if "CHAR" in parentList:
-                    QtWidgets.QMessageBox.information(self, "Alert", "CHAR type asset selected to create ENVIR layer!")
+                    QtGui.QMessageBox.information(self, "Alert", "CHAR type asset selected to create ENVIR layer!")
                 else:
                     self.renderLayerController.createCustomEnvirLayer(layerName, self.cutOutCheckBox.isChecked())
             else:
                 if "ENVIR" in parentList:
-                    QtWidgets.QMessageBox.information(self, "Alert", "ENVIR type asset selected to create ENVIR layer!")
+                    QtGui.QMessageBox.information(self, "Alert", "ENVIR type asset selected to create ENVIR layer!")
                 else:
                     self.renderLayerController.createCustomCharLayer(layerName, self.cutOutCheckBox.isChecked())
         
 
-class RenderLayerSetup(MayaQWidgetDockableMixin, QtWidgets.QDialog):
-    def __init__(self, parent=None):
-        super(RenderLayerSetup, self).__init__(parent=parent)
+class RenderLayerSetup(QtGui.QWidget):
+    
+    def __init__ (self):
+        super(RenderLayerSetup, self).__init__ ()
         self.showCustomLayer = 0
         self.renderLayerController = RenderLayerController()
         self.initUI()
         
     def initUI(self):
         #main layout
-        vbox = QtWidgets.QVBoxLayout()
+        vbox = QtGui.QVBoxLayout()
         
         #top frame
-        topFrame = QtWidgets.QFrame()
-        topFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        topFrame = QtGui.QFrame()
+        topFrame.setFrameShape(QtGui.QFrame.StyledPanel)
+        
+        #middle frame
+        middleFrame = QtGui.QFrame()
+        middleFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         
         #bottom frame
-        bottomFrame = QtWidgets.QFrame()
-        bottomFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        bottomFrame = QtGui.QFrame()
+        bottomFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         
         #split window and add frame
-        splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
+        splitter = QtGui.QSplitter(QtCore.Qt.Vertical)
         splitter.addWidget(topFrame)
+        splitter.addWidget(middleFrame)
+        splitter.setStretchFactor(1,1)
+        splitter.setSizes([100,100])
         splitter.addWidget(bottomFrame)
+
         
         #add splitter to main layout
         vbox.addWidget(splitter)
         
         #create default layer buttons
-        self.btnEnvir = QtWidgets.QPushButton('ENVIR', self)
+        self.btnEnvir = QtGui.QPushButton('ENVIR', self)
         self.btnEnvir.move(20, 20)
         self.btnEnvir.clicked.connect(self.createEnvirLayer)
         
-        self.btnChar = QtWidgets.QPushButton('CHAR', self)
+        self.btnChar = QtGui.QPushButton('CHAR', self)
         self.btnChar.move(20, 20)
         self.btnChar.clicked.connect(self.createCharLayer)
         
-        self.btnCustom = QtWidgets.QPushButton('Custom', self)
+        self.btnCustom = QtGui.QPushButton('...  Add More Layers ...', self)
         self.btnCustom.move(20, 20)
         self.btnCustom.clicked.connect(self.toggleAnimation)
         
-        #self.btnCancelCustomLayer = QtGui.QPushButton('Cancel', self)
-        #self.btnCancelCustomLayer.move(20, 20)
-        #self.btnCancelCustomLayer.clicked.connect(self.hideCustomLayerWidget)
-        
         #create grid layout to add buttons
-        defaultBtnGridLayout = QtWidgets.QGridLayout()
+        defaultBtnGridLayout = QtGui.QGridLayout()
         defaultBtnGridLayout.addWidget(self.btnEnvir, 0, 0)
         defaultBtnGridLayout.addWidget(self.btnChar, 0, 1)
         
@@ -112,18 +118,37 @@ class RenderLayerSetup(MayaQWidgetDockableMixin, QtWidgets.QDialog):
         self.customLayer = CustomLayerSetup(self, self.renderLayerController)
         self.toggleAnimation()
         #vertical layout for bottom frame
-        vboxCustom = QtWidgets.QVBoxLayout()
+        vboxCustom = QtGui.QVBoxLayout()
         vboxCustom.addWidget(self.btnCustom)
         vboxCustom.addWidget(self.customLayer)
         
         #set vertical layout for bottom frame
-        bottomFrame.setLayout(vboxCustom)
+        middleFrame.setLayout(vboxCustom)
+        
+        
+        #create import export buttons
+        self.btnExport = QtGui.QPushButton('EXPORT', self)
+        self.btnExport.move(20, 20)
+        self.btnExport.clicked.connect(self.exportRenderSetup)
+        
+        self.btnImport = QtGui.QPushButton('IMPORT', self)
+        self.btnImport.move(20, 20)
+        self.btnImport.clicked.connect(self.importRenderSetup)
+        
+        #create grid layout to add import export buttons
+        imExpBtnsGridLayout = QtGui.QGridLayout()
+        imExpBtnsGridLayout.addWidget(self.btnExport, 0, 0)
+        imExpBtnsGridLayout.addWidget(self.btnImport, 0, 1)
+        
+        #set grid layout for bottom frame
+        bottomFrame.resize(100,100)
+        bottomFrame.setLayout(imExpBtnsGridLayout)
         
         self.setLayout(vbox)
         self.setGeometry(300, 300, 300, 100)
         self.setWindowTitle('Render Layer Setup')
         self.show()
-        
+   
     def toggleAnimation(self):
         self.animation = QtCore.QPropertyAnimation(self.customLayer, "maximumHeight")
         
@@ -146,4 +171,11 @@ class RenderLayerSetup(MayaQWidgetDockableMixin, QtWidgets.QDialog):
     def createCharLayer(self):
         self.renderLayerController.createCharLayer("CHAR")
         
-test = RenderLayerSetup()
+    def exportRenderSetup(self):
+        pass
+        
+    def importRenderSetup(self):
+        pass
+
+
+renderLayerSetup = RenderLayerSetup()

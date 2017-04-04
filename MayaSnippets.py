@@ -37,3 +37,15 @@ def getAssetList(type):
             filteredList.append(node)
             
     return filteredList
+
+#To get the parents of a shape node recursively
+def getParent(node):
+    parentNode = cmds.listRelatives(node, allParents=True)
+    if parentNode is None:
+        return []
+    return [parentNode[0]] + getTopParent(parentNode)  
+
+def getListUptoFirstMeshNode(groupName):
+    shapeNode = cmds.ls(groupName, dag=1, type='mesh')[0]
+    parentList = getParent(shapeNode)[::-1]
+    return ("").join(map(lambda node: "|"+str(node), parentList))

@@ -1,6 +1,5 @@
 from PyQt4 import QtCore, QtGui
 from RenderLayerController import RenderLayerController
-import maya.cmds as cmds
 import sys
 
 class CustomLayerSetup(QtGui.QWidget):
@@ -44,18 +43,11 @@ class CustomLayerSetup(QtGui.QWidget):
         else:
             layerType = str(self.comboLayerType.currentText())
             layerName = str(self.leLayerName.text()).upper()
-            parentList = list(set(map(lambda node: str(node).strip("|").split("|")[0], cmds.selectedNodes())))
             
             if layerType == "ENVIR":
-                if "CHAR" in parentList:
-                    QtGui.QMessageBox.information(self, "Alert", "CHAR type asset selected to create ENVIR layer!")
-                else:
-                    self.renderLayerController.createCustomEnvirLayer(layerName, self.cutOutCheckBox.isChecked())
-            else:
-                if "ENVIR" in parentList:
-                    QtGui.QMessageBox.information(self, "Alert", "ENVIR type asset selected to create ENVIR layer!")
-                else:
-                    self.renderLayerController.createCustomCharLayer(layerName, self.cutOutCheckBox.isChecked())
+				self.renderLayerController.createCustomEnvirLayer(layerType+":"+layerName, self.cutOutCheckBox.isChecked())
+            elif layerType == "CHAR":
+				self.renderLayerController.createCustomCharLayer(layerType+":"+layerName, self.cutOutCheckBox.isChecked())
         
 
 class RenderLayerSetup(QtGui.QWidget):
@@ -63,6 +55,7 @@ class RenderLayerSetup(QtGui.QWidget):
     def __init__ (self):
         super(RenderLayerSetup, self).__init__ ()
         
+        self._RLSWindow = None
         self.renderLayerController = RenderLayerController()
         
         self.showCustomLayer = 0
@@ -151,7 +144,7 @@ class RenderLayerSetup(QtGui.QWidget):
         self.setLayout(vbox)
         self.setGeometry(300, 300, 300, 100)
         self.setWindowTitle('Render Layer Setup')
-        self.show()
+        #self.show()
    
     def toggleAnimation(self):
         self.animation = QtCore.QPropertyAnimation(self.customLayer, "maximumHeight")
@@ -175,17 +168,35 @@ class RenderLayerSetup(QtGui.QWidget):
     def createCharLayer(self):
         self.renderLayerController.createCharLayer("CHAR")
         
+    def populateAssets(self):
+        self.renderLayerController.populateAssetTypes()
+        
     def exportRenderSetup(self):
         templateDir = "/homes/sharmah/maya/Templates/"
         filename = QtGui.QFileDialog.getSaveFileName(self, "Export File", templateDir, "JSON Files (*.json)")
-        filePath = templateDir+filename
-        self.renderLayerController.importSetup(filePath)
+        filePath = filename
+        self.renderLayerController.exportSetup(filePath)
+        
         
     def importRenderSetup(self):
         templateDir = "/homes/sharmah/maya/Templates/"
         filename = QtGui.QFileDialog.getOpenFileName(self, "Import File", templateDir, "JSON Files (*.json)")
-        filePath = templateDir+filename
-        self.renderLayerController.exportSetup(filePath)
+        filePath = filename
+        self.renderLayerController.importSetup(filePath)
+		
 
 
-renderLayerSetup = RenderLayerSetup()
+class MainRLSWindow(QtGui.QMainWindow):
+	def __init__(self):
+		super(MainRLSWindow, self).__init__()
+		self._RLSWindow = None
+		
+	def showRenderLayerSetupWidget(self):
+		if self._RLSWindow is None:
+			self._RLSWindow = RenderLayerSetup()
+		self._RLSWindow.show()
+		#timer = QtCore.QTimer()
+		#timer.singleShot(0,myapp.onQApplicationStarted)
+	
+	def getAssetTypes(self):
+		self._RLSWindow.populateAssets()

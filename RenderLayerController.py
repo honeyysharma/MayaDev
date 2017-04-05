@@ -4,7 +4,10 @@ from RenderLayers import EnvirLayer, CharLayer, importRenderSetup, exportRenderS
 
 class RenderLayerController(object):
     def __init__(self):
-        getAssets()
+		pass
+    
+    def populateAssetTypes(self):
+		getAssets()
         
     def createEnvirLayer(self, layerName):
         layer = EnvirLayer(layerName)
@@ -12,7 +15,7 @@ class RenderLayerController(object):
         #layer.turnOffCharLights()
         layer.turnOffAllChar(False)
         layer.createAllEnvirCollection()
-        layer.switchToLayer()
+        #layer.switchToLayer()
     
     def createCharLayer(self, layerName):
         layer = CharLayer(layerName)
@@ -20,7 +23,7 @@ class RenderLayerController(object):
         #layer.turnOffEnvirLights()
         layer.turnOffAllEnvir(True)
         layer.createAllCharCollection()
-        layer.switchToLayer()
+        #layer.switchToLayer()
         
     def createCustomEnvirLayer(self, layerName, isCutoutChecked):
         layer = EnvirLayer(layerName)
@@ -32,7 +35,7 @@ class RenderLayerController(object):
         
         layer.createCustomEnvirCollection(isCutoutChecked)
         layer.turnOffAllChar(False)
-        layer.switchToLayer()
+        #layer.switchToLayer()
         
     def createCustomCharLayer(self, layerName, isCutoutChecked):
         layer = CharLayer(layerName)
@@ -44,7 +47,7 @@ class RenderLayerController(object):
         layer.turnOffAllChar(isCutoutChecked)
         
         layer.createCustomCharCollection(isCutoutChecked)
-        layer.switchToLayer()
+        #layer.switchToLayer()
         
     def importSetup(self, filePath):
         importRenderSetup(filePath)

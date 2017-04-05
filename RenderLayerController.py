@@ -1,21 +1,15 @@
 import sys
+from RenderLayers import EnvirLayer, CharLayer, importRenderSetup, exportRenderSetup, getAssets
 
-path = "/homes/sharmah/maya/projects/RenderSetup2016/scripts/"
-if path not in sys.path:
-    sys.path.append(path)
-
-from RenderLayers import EnvirLayer, CharLayer
-#import RenderLayers
-#reload(RenderLayers)
 
 class RenderLayerController(object):
     def __init__(self):
-        pass
+        getAssets()
         
     def createEnvirLayer(self, layerName):
         layer = EnvirLayer(layerName)
         layer.createCollectionForAllLights()
-        layer.turnOffCharLights()
+        #layer.turnOffCharLights()
         layer.turnOffAllChar(False)
         layer.createAllEnvirCollection()
         layer.switchToLayer()
@@ -23,7 +17,7 @@ class RenderLayerController(object):
     def createCharLayer(self, layerName):
         layer = CharLayer(layerName)
         layer.createCollectionForAllLights()
-        layer.turnOffEnvirLights()
+        #layer.turnOffEnvirLights()
         layer.turnOffAllEnvir(True)
         layer.createAllCharCollection()
         layer.switchToLayer()
@@ -31,7 +25,7 @@ class RenderLayerController(object):
     def createCustomEnvirLayer(self, layerName, isCutoutChecked):
         layer = EnvirLayer(layerName)
         layer.createCollectionForAllLights()
-        layer.turnOffCharLights()
+        #layer.turnOffCharLights()
         
         #toggle only Envir cutout
         layer.turnOffAllEnvir(isCutoutChecked)
@@ -43,7 +37,7 @@ class RenderLayerController(object):
     def createCustomCharLayer(self, layerName, isCutoutChecked):
         layer = CharLayer(layerName)
         layer.createCollectionForAllLights()
-        layer.turnOffEnvirLights()
+        #layer.turnOffEnvirLights()
         layer.turnOffAllEnvir(True)
         
         #toggle only Char cutout
@@ -51,3 +45,9 @@ class RenderLayerController(object):
         
         layer.createCustomCharCollection(isCutoutChecked)
         layer.switchToLayer()
+        
+    def importSetup(self, filePath):
+        importRenderSetup(filePath)
+        
+    def exportSetup(self, filePath):
+        exportRenderSetup(filePath)

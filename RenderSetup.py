@@ -62,8 +62,13 @@ class RenderLayerSetup(QtGui.QWidget):
     
     def __init__ (self):
         super(RenderLayerSetup, self).__init__ ()
-        self.showCustomLayer = 0
+        
         self.renderLayerController = RenderLayerController()
+        
+        self.showCustomLayer = 0
+        self.customLayer = CustomLayerSetup(self, self.renderLayerController)
+        self.toggleAnimation()
+        
         self.initUI()
         
     def initUI(self):
@@ -115,8 +120,7 @@ class RenderLayerSetup(QtGui.QWidget):
         #set grid layout for top frame
         topFrame.setLayout(defaultBtnGridLayout)
         
-        self.customLayer = CustomLayerSetup(self, self.renderLayerController)
-        self.toggleAnimation()
+        
         #vertical layout for bottom frame
         vboxCustom = QtGui.QVBoxLayout()
         vboxCustom.addWidget(self.btnCustom)
@@ -172,10 +176,16 @@ class RenderLayerSetup(QtGui.QWidget):
         self.renderLayerController.createCharLayer("CHAR")
         
     def exportRenderSetup(self):
-        pass
+        templateDir = "/homes/sharmah/maya/Templates/"
+        filename = QtGui.QFileDialog.getSaveFileName(self, "Export File", templateDir, "JSON Files (*.json)")
+        filePath = templateDir+filename
+        self.renderLayerController.importSetup(filePath)
         
     def importRenderSetup(self):
-        pass
+        templateDir = "/homes/sharmah/maya/Templates/"
+        filename = QtGui.QFileDialog.getOpenFileName(self, "Import File", templateDir, "JSON Files (*.json)")
+        filePath = templateDir+filename
+        self.renderLayerController.exportSetup(filePath)
 
 
 renderLayerSetup = RenderLayerSetup()

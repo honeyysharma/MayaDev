@@ -49,3 +49,9 @@ def getListUptoFirstMeshNode(groupName):
     shapeNode = cmds.ls(groupName, dag=1, type='mesh')[0]
     parentList = getParent(shapeNode)[::-1]
     return ("").join(map(lambda node: "|"+str(node), parentList))
+
+#To get current maya scene file
+print cmds.file(q=1, sceneName=1)
+
+#To get current maya project
+print cmds.workspace(q=1, fn=1)

@@ -1,13 +1,10 @@
 import maya.cmds as cmds
 import maya.app.renderSetup.model.renderSetup as renderSetup
+import maya.app.renderSetup.model.renderLayer as renderLayer
 import maya.app.renderSetup.model.override as override
 import os
 import json
 from sgtkLib import tkm, tkutil
-
-print os.path.dirname(os.path.abspath(cmds.file(q=1, sceneName=1)))
-sceneFileName = os.path.basename(cmds.file(q=1, sceneName=1))
-print sceneFileName[:sceneFileName.find(".")]
 
 __assets = {}
 
@@ -54,9 +51,15 @@ def getAssets():
 def assets():
     return __assets
 
+def deleteLayer(layerName):
+	layer = renderSetup.instance().getRenderLayer(layerName)
+	if layer.isVisible():
+		renderSetup.instance().switchToLayer(renderSetup.instance().getDefaultRenderLayer())
+	renderSetup.instance().detachRenderLayer(layer)
+	renderLayer.delete(layer)
 
 def importRenderSetup(filePath):
-    currentLayers = map(lambda layer: layer.name(), rs.getRenderLayers())
+    currentLayers = map(lambda layer: layer.name(), renderSetup.instance().getRenderLayers())
     
     with open(filePath, "r") as file:
         data = json.load(file)
@@ -69,20 +72,20 @@ def importRenderSetup(filePath):
             sceneFileName = os.path.basename(cmds.file(q=1, sceneName=1))
             bckupFilePath = os.path.join(os.path.dirname(os.path.abspath(cmds.file(q=1, sceneName=1))), "RS_Bckup_"+sceneFileName[:sceneFileName.find(".")]+".json")
             with open(bckupFilePath, "w+") as file:
-                json.dump(rs.encode(note), fp=file, indent=2, sort_keys=True) 
+                json.dump(renderSetup.instance().encode(None), fp=file, indent=2, sort_keys=True) 
 
             #delete layers from render setup that are there in the imported file
-            [self.deleteLayer(layer) for layer in importedLayers if layer in currentLayers]
+            [deleteLayer(layer) for layer in importedLayers if layer in currentLayers]
             
             #import render setup
-            rs.decode(data, renderSetup.DECODE_AND_MERGE, None)
+            renderSetup.instance().decode(data, renderSetup.DECODE_AND_MERGE, None)
             
     else:
         raise TypeError("Can't perform import on the file which wasn't exported using Render Layer Setup")
         
 def exportRenderSetup(filePath, note = None):
     with open(filePath, "w+") as file:
-        json.dump(rs.encode(note), fp=file, indent=2, sort_keys=True) 
+        json.dump(renderSetup.instance().encode(note), fp=file, indent=2, sort_keys=True) 
 
 class Layer(object):
     def __init__(self, layerName):
@@ -161,13 +164,7 @@ class Layer(object):
         
     def getTopParentOfSelectedNodes(nodes):
         return list(set(map(lambda node: str(node).strip("|").split("|")[0], nodes)))
-        
-    def deleteLayer(self, layerName):
-        layer = rs.getRenderLayer(layerName)
-        if layer.isVisible():
-            rs.switchToLayer(rs.getDefaultRenderLayer())
-        rs.detachRenderLayer(layer)
-        renderLayer.delete(layer)
+
         
 class EnvirLayer(Layer):
     
@@ -224,3 +221,50 @@ class CharLayer(Layer):
         else:
             o_customCharVisibility.finalize(attribute+".primaryVisibility")
             o_customCharVisibility.setAttrValue(1)
+            
+"""          
+def createEnvirLayer(layerName):
+    layer = EnvirLayer(layerName)
+    layer.createCollectionForAllLights()
+    #layer.turnOffCharLights()
+    layer.turnOffAllChar(False)
+    layer.createAllEnvirCollection()
+    #layer.switchToLayer()     #-------- Throwing RuntimeError----------#
+    
+def createCharLayer(layerName):
+    layer = CharLayer(layerName)
+    layer.createCollectionForAllLights()
+    #layer.turnOffEnvirLights()
+    layer.turnOffAllEnvir(False)
+    layer.createAllCharCollection()
+    #layer.switchToLayer()
+    
+def createCustomEnvirLayer(layerName, isCutoutChecked):
+    layer = EnvirLayer(layerName)
+    layer.createCollectionForAllLights()
+    #layer.turnOffCharLights()
+    
+    #toggle only Envir cutout
+    layer.turnOffAllEnvir(isCutoutChecked)
+    
+    layer.createCustomEnvirCollection(isCutoutChecked)
+    layer.turnOffAllChar(False)
+    #layer.switchToLayer()
+
+def createCustomCharLayer(layerName, isCutoutChecked):
+    layer = CharLayer(layerName)
+    layer.createCollectionForAllLights()
+    #layer.turnOffEnvirLights()
+    layer.turnOffAllEnvir(True)
+    
+    #toggle only Char cutout
+    layer.turnOffAllChar(isCutoutChecked)
+    
+    layer.createCustomCharCollection(isCutoutChecked)
+    #layer.switchToLayer()
+
+createEnvirLayer("ENVIR")
+createCharLayer("CHAR")
+createCustomEnvirLayer("Tree", False)
+createCustomCharLayer("Shirt", False)
+"""

@@ -16,37 +16,50 @@ def isGroup(node):
         return True 
 
 def getAssets():
-    prod = os.environ['PROD']
-    tank, sgw, project = tkutil.getTk(prod, fast=True)
-    filteredList = []
-    
-    topGroupNodes = cmds.ls(assemblies=True)
-    assetNodes = filter(lambda node: isGroup(node), topGroupNodes)
+	
+	sceneFileName = os.path.basename(cmds.file(q=1, sceneName=1))
+	assetCategoryFilePath = os.path.join(os.path.dirname(os.path.abspath(cmds.file(q=1, sceneName=1))), "AssetCategory.json")
+	
+	if not os.path.isfile(assetCategoryFilePath):
+		prod = os.environ['PROD']
+		tank, sgw, project = tkutil.getTk(prod, fast=True)
+		filteredList = []
+		
+		topGroupNodes = cmds.ls(assemblies=True)
+		assetNodes = filter(lambda node: isGroup(node), topGroupNodes)
 
-    envirList = []
-    charList = []
-    propList = []
+		envirList = []
+		charList = []
+		propList = []
 
-    for node in assetNodes:
-        filename = cmds.referenceQuery(node, filename=True)
+		for node in assetNodes:
+			if "light" not in node and "LIGHT" not in node:
+				filename = cmds.referenceQuery(node, filename=True)
 
-        ctx =  tank.context_from_path(filename)
-        entity = ctx.entity
-        asset_name = str(entity['name'])
+				ctx =  tank.context_from_path(filename)
+				entity = ctx.entity
+				asset_name = str(entity['name'])
 
-        asset = sgw.Asset(asset_name, project=project)
-        asset_type = asset.sg_asset_type
+				asset = sgw.Asset(asset_name, project=project)
+				asset_type = asset.sg_asset_type
 
-        if asset_type == "environment":
-            envirList.append(node)
-        elif asset_type == "character":
-            if "shot_cam" not in node:
-                charList.append(node)
-        elif asset_type == "prop":
-            propList.append(node)
-            
-    global __assets 
-    __assets = {"ENVIR":envirList, "CHAR":charList, "PROP":propList}
+				if asset_type == "environment":
+					envirList.append(node)
+				elif asset_type == "character":
+					if "shot_cam" not in node:
+						charList.append(node)
+				elif asset_type == "prop":
+					propList.append(node)
+				
+		global __assets 
+		__assets = {"ENVIR":envirList, "CHAR":charList, "PROP":propList}
+		
+		with open(assetCategoryFilePath, 'w') as file:
+			json.dump(__assets, file, sort_keys=True, indent=4)
+			
+	else:
+		with open(assetCategoryFilePath, 'r') as file:
+			__assets = json.load(file)
  
 def assets():
     return __assets
@@ -175,9 +188,9 @@ class EnvirLayer(Layer):
         """turn off char lights in envir"""
         c_offCharLights = self.layer.createCollection("c_OffCharLights")
         c_offCharLights.getSelector().setFilterType(4)
-        c_offCharLights.getSelector().setPattern("LIGHTS:LIGHTS_CHAR*")
+        c_offCharLights.getSelector().setPattern("LIGHTS_CHAR*")
         o_offCharLgtVisibility = c_offCharLights.createOverride("offCharLgtVisibility", override.AbsOverride.kTypeId)
-        o_offCharLgtVisibility.finalize("LIGHTS:LIGHTS_CHAR.visibility")
+        o_offCharLgtVisibility.finalize("LIGHTS_CHAR.visibility")
         o_offCharLgtVisibility.setAttrValue(0)
         
     def createCustomEnvirCollection(self, isCutoutChecked):
@@ -203,9 +216,9 @@ class CharLayer(Layer):
         """turn off envir lights in char"""
         c_offEnvirLights = self.layer.createCollection("c_OffEnvirLights")
         c_offEnvirLights.getSelector().setFilterType(4)
-        c_offEnvirLights.getSelector().setPattern("LIGHTS:LIGHTS_ENVIR*")
+        c_offEnvirLights.getSelector().setPattern("LIGHTS_ENVIR*")
         o_offEnvirLgtVisibility = c_offEnvirLights.createOverride("offEnvirLgtVisibility", override.AbsOverride.kTypeId)
-        o_offEnvirLgtVisibility.finalize("LIGHTS:LIGHTS_ENVIR.visibility")
+        o_offEnvirLgtVisibility.finalize("LIGHTS_ENVIR.visibility")
         o_offEnvirLgtVisibility.setAttrValue(0)
         
     def createCustomCharCollection(self, isCutoutChecked):
@@ -268,4 +281,3 @@ createCharLayer("CHAR")
 createCustomEnvirLayer("Tree", False)
 createCustomCharLayer("Shirt", False)
 """
-

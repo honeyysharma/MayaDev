@@ -59,3 +59,9 @@ print cmds.workspace(q=1, fn=1)
 #To check the value of a particular attribute of a type of node
 for node in cmds.ls(type="file"):
     print cmds.getAttr(node+".aiAutoTx")
+
+    import maya.cmds as cmds
+
+#To set an attribute of a node type
+for node in cmds.ls(type="file"):
+    cmds.setAttr(node+".aiAutoTx",False)

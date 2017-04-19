@@ -55,3 +55,7 @@ print cmds.file(q=1, sceneName=1)
 
 #To get current maya project
 print cmds.workspace(q=1, fn=1)
+
+#To check the value of a particular attribute of a type of node
+for node in cmds.ls(type="file"):
+    print cmds.getAttr(node+".aiAutoTx")

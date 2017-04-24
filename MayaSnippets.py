@@ -65,3 +65,6 @@ for node in cmds.ls(type="file"):
 #To set an attribute of a node type
 for node in cmds.ls(type="file"):
     cmds.setAttr(node+".aiAutoTx",False)
+
+#To get the nodes using regex
+print cmds.ls("*LIGHTS*") #It will pick up all the nodes containing LIGHTS

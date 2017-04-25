@@ -188,9 +188,12 @@ class EnvirLayer(Layer):
         """turn off char lights in envir"""
         c_offCharLights = self.layer.createCollection("c_OffCharLights")
         c_offCharLights.getSelector().setFilterType(4)
-        c_offCharLights.getSelector().setPattern("LIGHTS_CHAR*")
+        c_offCharLights.getSelector().setPattern("*LIGHTS_CHAR*")
         o_offCharLgtVisibility = c_offCharLights.createOverride("offCharLgtVisibility", override.AbsOverride.kTypeId)
-        o_offCharLgtVisibility.finalize("LIGHTS_CHAR.visibility")
+        
+        lgtCharGrp = str(cmds.ls("*LIGHTS_CHAR*")[0])
+        
+        o_offCharLgtVisibility.finalize(lgtCharGrp+".visibility")
         o_offCharLgtVisibility.setAttrValue(0)
         
     def createCustomEnvirCollection(self, isCutoutChecked):
@@ -216,9 +219,12 @@ class CharLayer(Layer):
         """turn off envir lights in char"""
         c_offEnvirLights = self.layer.createCollection("c_OffEnvirLights")
         c_offEnvirLights.getSelector().setFilterType(4)
-        c_offEnvirLights.getSelector().setPattern("LIGHTS_ENVIR*")
+        c_offEnvirLights.getSelector().setPattern("*LIGHTS_ENVIR*")
         o_offEnvirLgtVisibility = c_offEnvirLights.createOverride("offEnvirLgtVisibility", override.AbsOverride.kTypeId)
-        o_offEnvirLgtVisibility.finalize("LIGHTS_ENVIR.visibility")
+        
+        lgtEnvGrp = str(cmds.ls("*LIGHTS_ENVIR*")[0])
+        
+        o_offEnvirLgtVisibility.finalize(lgtEnvGrp+".visibility")
         o_offEnvirLgtVisibility.setAttrValue(0)
         
     def createCustomCharCollection(self, isCutoutChecked):

@@ -68,3 +68,6 @@ for node in cmds.ls(type="file"):
 
 #To get the nodes using regex
 print cmds.ls("*LIGHTS*") #It will pick up all the nodes containing LIGHTS
+
+#Creating shader nodes and shader groups and connecting them.
+#https://mayapy.wordpress.com/2011/11/04/create-shaders-through-python/

@@ -23,7 +23,7 @@ class CustomLayerSetup(QtGui.QWidget):
         self.cutOutCheckBox = QtGui.QCheckBox("With Cutouts")
         self.cutOutCheckBox.setChecked(False)
         
-        self.btnAddLayer = QtGui.QPushButton('Add', self)
+        self.btnAddLayer = QtGui.QPushButton('ADD', self)
         self.btnAddLayer.move(20, 20)
         self.btnAddLayer.clicked.connect(self.createCustomLayer)
         
@@ -46,9 +46,9 @@ class CustomLayerSetup(QtGui.QWidget):
             layerName = str(self.leLayerName.text()).upper()
             
             if layerType == "ENVIR":
-				self.renderLayerController.createCustomEnvirLayer(layerType+":"+layerName, self.cutOutCheckBox.isChecked())
+				self.renderLayerController.createCustomEnvirLayer(layerType+"_"+layerName, self.cutOutCheckBox.isChecked())
             elif layerType == "CHAR":
-				self.renderLayerController.createCustomCharLayer(layerType+":"+layerName, self.cutOutCheckBox.isChecked())
+				self.renderLayerController.createCustomCharLayer(layerType+"_"+layerName, self.cutOutCheckBox.isChecked())
         
 
 class RenderLayerSetup(QtGui.QWidget):
@@ -69,6 +69,10 @@ class RenderLayerSetup(QtGui.QWidget):
 	def initUI(self):
 		#main layout
 		vbox = QtGui.QVBoxLayout()
+		
+		#light rig frame
+		lightRigFrame = QtGui.QFrame()
+		lightRigFrame.setFrameShape(QtGui.QFrame.StyledPanel)
 
 		#top frame
 		topFrame = QtGui.QFrame()
@@ -84,6 +88,7 @@ class RenderLayerSetup(QtGui.QWidget):
 
 		#split window and add frame
 		splitter = QtGui.QSplitter(QtCore.Qt.Vertical)
+		splitter.addWidget(lightRigFrame)
 		splitter.addWidget(topFrame)
 		splitter.addWidget(middleFrame)
 		splitter.setStretchFactor(1,1)
@@ -93,21 +98,38 @@ class RenderLayerSetup(QtGui.QWidget):
 
 		#add splitter to main layout
 		vbox.addWidget(splitter)
+		
+		#create import and export light rig buttons
+		self.btnExportRig = QtGui.QPushButton('Export Rig', self)
+		self.btnExportRig.move(20, 20)
+		self.btnExportRig.clicked.connect(self.exportLightRig)
+		
+		self.btnImportRig = QtGui.QPushButton('Referece Rig', self)
+		self.btnImportRig.move(20, 20)
+		self.btnImportRig.clicked.connect(self.importLightRig)
 
 		#create default layer buttons
-		self.btnEnvir = QtGui.QPushButton('ENVIR', self)
+		self.btnEnvir = QtGui.QPushButton('ADD ENVIR LAYER', self)
 		self.btnEnvir.move(20, 20)
 		self.btnEnvir.clicked.connect(self.createEnvirLayer)
 
-		self.btnChar = QtGui.QPushButton('CHAR', self)
+		self.btnChar = QtGui.QPushButton('ADD CHAR LAYER', self)
 		self.btnChar.move(20, 20)
 		self.btnChar.clicked.connect(self.createCharLayer)
 
 		self.btnCustom = QtGui.QPushButton('...  Add More Layers ...', self)
 		self.btnCustom.move(20, 20)
 		self.btnCustom.clicked.connect(self.toggleAnimation)
+		
+		#create grid layout to add import and export light rig buttons
+		rigBtnGridLayout = QtGui.QGridLayout()
+		rigBtnGridLayout.addWidget(self.btnExportRig, 0, 0)
+		rigBtnGridLayout.addWidget(self.btnImportRig, 0, 1)
+		
+		#set grid layout for light rig frame
+		lightRigFrame.setLayout(rigBtnGridLayout)
 
-		#create grid layout to add buttons
+		#create grid layout to add envir and char layer buttons
 		defaultBtnGridLayout = QtGui.QGridLayout()
 		defaultBtnGridLayout.addWidget(self.btnEnvir, 0, 0)
 		defaultBtnGridLayout.addWidget(self.btnChar, 0, 1)
@@ -126,11 +148,11 @@ class RenderLayerSetup(QtGui.QWidget):
 
 
 		#create import export buttons
-		self.btnExport = QtGui.QPushButton('EXPORT', self)
+		self.btnExport = QtGui.QPushButton('EXPORT RENDER SETUP', self)
 		self.btnExport.move(20, 20)
 		self.btnExport.clicked.connect(self.exportRenderSetup)
 
-		self.btnImport = QtGui.QPushButton('IMPORT', self)
+		self.btnImport = QtGui.QPushButton('IMPORT RENDER SETUP', self)
 		self.btnImport.move(20, 20)
 		self.btnImport.clicked.connect(self.importRenderSetup)
 
@@ -170,20 +192,24 @@ class RenderLayerSetup(QtGui.QWidget):
 	def createCharLayer(self):
 		self.renderLayerController.createCharLayer("CHAR")
 
+	def exportLightRig(self):
+		self.renderLayerController.exportRig()
+		
+	def importLightRig(self):
+		seqLightDir = self.renderLayerController.getSeqLightingDir()
+		filePath = QtGui.QFileDialog.getOpenFileName(self, "Referece Light Rig File", seqLightDir, "Maya ASCII (*.ma)")
+		self.renderLayerController.importRig(filePath)
+
 	def showEvent(self, event):
 		super(RenderLayerSetup, self).showEvent(event)
 		self.signal_shown.emit()
 
 	def exportRenderSetup(self):
-		templateDir = "/homes/sharmah/maya/Templates/"
-		filename = QtGui.QFileDialog.getSaveFileName(self, "Export File", templateDir, "JSON Files (*.json)")
-		filePath = filename
-		self.renderLayerController.exportSetup(filePath)
+		self.renderLayerController.exportSetup()
 
 	def importRenderSetup(self):
-		templateDir = "/homes/sharmah/maya/Templates/"
-		filename = QtGui.QFileDialog.getOpenFileName(self, "Import File", templateDir, "JSON Files (*.json)")
-		filePath = filename
+		seqLightDir = self.renderLayerController.getSeqLightingDir()
+		filePath = QtGui.QFileDialog.getOpenFileName(self, "Import File", seqLightDir, "JSON Files (*.json)")
 		self.renderLayerController.importSetup(filePath)
 		
 

@@ -104,7 +104,7 @@ class RenderLayerSetup(QtGui.QWidget):
 		self.btnExportRig.move(20, 20)
 		self.btnExportRig.clicked.connect(self.exportLightRig)
 		
-		self.btnImportRig = QtGui.QPushButton('Referece Rig', self)
+		self.btnImportRig = QtGui.QPushButton('Reference Rig', self)
 		self.btnImportRig.move(20, 20)
 		self.btnImportRig.clicked.connect(self.importLightRig)
 
